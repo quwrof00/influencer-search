@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import type { Platform, UserProfileSummary } from "@/types";
 import { VerifiedBadge } from "./VerifiedBadge";
 import { useProfileStore } from "@/store/useProfileStore";
+import { Plus, Minus } from "lucide-react";
 
 interface ProfileCardProps {
   profile: UserProfileSummary;
@@ -45,28 +46,44 @@ export function ProfileCard({
   return (
     <div
       onClick={handleClick}
-      className="flex items-center gap-3 p-3 border border-gray-300 mb-2 cursor-pointer hover:bg-gray-50 w-[700px] transition-colors"
+      className="group relative flex flex-col p-6 bg-white cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-xl w-full border border-black/5 rounded-xl"
       data-search={searchQuery}
     >
-      <img src={profile.picture} className="w-12 h-12 rounded-full object-cover" alt={profile.fullname} />
-      <div className="text-left flex-1">
-        <div className="font-bold flex items-center gap-1">
+      <div className="flex items-start justify-between">
+        <img 
+          src={profile.picture || `https://ui-avatars.com/api/?name=${encodeURIComponent(identifier)}&background=random`} 
+          onError={(e) => {
+            e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(identifier)}&background=random`;
+          }}
+          className="w-16 h-16 rounded-full object-cover border-2 border-[#FAF8F4]" 
+          alt={profile.fullname || identifier} 
+        />
+        
+        <button
+          className={`p-2 rounded-full border transition-colors ${
+            isSelected
+              ? "bg-black text-white border-black hover:bg-gray-800"
+              : "bg-white text-black border-black/10 hover:border-black"
+          }`}
+          onClick={handleToggleList}
+          aria-label={isSelected ? "Remove from list" : "Add to list"}
+        >
+          {isSelected ? <Minus size={16} /> : <Plus size={16} />}
+        </button>
+      </div>
+
+      <div className="mt-4 text-left flex-1">
+        <div className="font-black text-lg text-black flex items-center gap-1 leading-tight">
           @{identifier}
           <VerifiedBadge verified={profile.is_verified} />
         </div>
-        <div className="text-sm text-gray-600">{profile.fullname}</div>
-        <div className="text-sm text-gray-500">{formatFollowersLocal(profile.followers)}</div>
+        <div className="text-sm font-medium text-gray-500 mt-1">{profile.fullname}</div>
       </div>
-      <button
-        className={`px-3 py-1.5 text-sm font-medium rounded transition-colors ${
-          isSelected
-            ? "bg-red-50 text-red-600 border border-red-200 hover:bg-red-100"
-            : "bg-blue-600 text-white hover:bg-blue-700"
-        }`}
-        onClick={handleToggleList}
-      >
-        {isSelected ? "Remove" : "Add to List"}
-      </button>
+      
+      <div className="mt-6 pt-4 border-t border-black/5 flex justify-between items-center">
+        <div className="text-sm font-bold text-black">{formatFollowersLocal(profile.followers)}</div>
+        <div className="text-xs font-semibold text-gray-400 uppercase tracking-widest">{platform}</div>
+      </div>
     </div>
   );
 }

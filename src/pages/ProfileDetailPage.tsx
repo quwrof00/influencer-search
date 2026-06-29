@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { Link, useParams, useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams, useNavigate } from "react-router-dom";
 import { Layout } from "@/components/Layout";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
 import type { FullUserProfile, ProfileDetailResponse } from "@/types";
-import { formatEngagementRate } from "@/utils/formatters";
 import { loadProfileByUsername } from "@/utils/profileLoader";
 import { useProfileStore } from "@/store/useProfileStore";
+import { motion } from "framer-motion";
+import { ArrowLeft, ExternalLink } from "lucide-react";
 
 function formatFollowersDetail(count: number) {
   if (count >= 1000000) return (count / 1000000).toFixed(2) + "M";
@@ -18,46 +19,39 @@ export function ProfileDetailPage() {
   const [searchParams] = useSearchParams();
   const platform = searchParams.get("platform") || "unknown";
   const { selectedProfiles, addProfile, removeProfile } = useProfileStore();
-  const [profileData, setProfileData] = useState<ProfileDetailResponse | null>(
-    null
-  );
+  const [profileData, setProfileData] = useState<ProfileDetailResponse | null>(null);
   const [loaded, setLoaded] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!username) return;
-
     loadProfileByUsername(username).then((data) => {
       setProfileData(data);
       setLoaded(true);
     });
   }, [username]);
 
-  if (!username) {
-    return (
-      <Layout>
-        <p>Invalid profile</p>
-        <Link to="/">Back</Link>
-      </Layout>
-    );
-  }
+  if (!username) return null;
 
   if (!loaded) {
     return (
-      <Layout title={`@${username}`}>
-        <p className="text-gray-400">Loading...</p>
+      <Layout>
+        <div className="w-full flex justify-center py-32">
+          <div className="w-8 h-8 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
+        </div>
       </Layout>
     );
   }
 
   if (!profileData) {
     return (
-      <Layout title={`@${username}`}>
-        <p className="text-red-600 mb-4">
-          Could not load profile details for {username}
-        </p>
-        <Link to="/" className="text-blue-600 underline">
-          Back to search
-        </Link>
+      <Layout>
+        <div className="text-center py-32">
+          <p className="text-xl font-bold mb-4">Profile not found</p>
+          <button onClick={() => navigate("/")} className="text-black font-semibold border-b-2 border-black pb-1">
+            Go back to search
+          </button>
+        </div>
       </Layout>
     );
   }
@@ -67,111 +61,99 @@ export function ProfileDetailPage() {
   const isSelected = selectedProfiles.some((p) => p.user_id === user.user_id);
 
   const handleToggleList = () => {
-    if (isSelected) {
-      removeProfile(user.user_id);
-    } else {
-      addProfile(user);
-    }
+    if (isSelected) removeProfile(user.user_id);
+    else addProfile(user);
   };
 
   return (
     <Layout title={user.fullname}>
-      <Link to="/" className="text-sm text-blue-600 mb-4 inline-block">
-        ← Back to search
-      </Link>
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="max-w-4xl mx-auto"
+      >
+        <button 
+          onClick={() => navigate(-1)} 
+          className="flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-black mb-12 transition-colors"
+        >
+          <ArrowLeft size={16} /> Back
+        </button>
 
-      <div className="flex gap-6 items-start text-left max-w-2xl mx-auto">
-        <img
-          src={user.picture}
-          className="w-24 h-24 rounded-full border"
-        />
-        <div className="flex-1">
-          <h2 className="text-xl font-bold">
-            @{identifier}
-            <VerifiedBadge verified={user.is_verified} />
-          </h2>
-          <p className="text-gray-600">{user.fullname}</p>
-          <p className="text-xs text-gray-400 mt-1">Platform: {platform}</p>
+        <div className="bg-white rounded-3xl p-8 md:p-12 border border-black/5 shadow-sm">
+          <div className="flex flex-col md:flex-row gap-8 items-start">
+            <img
+              src={user.picture || `https://ui-avatars.com/api/?name=${encodeURIComponent(identifier)}&background=random`}
+              onError={(e) => {
+                e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(identifier)}&background=random`;
+              }}
+              className="w-32 h-32 md:w-48 md:h-48 rounded-full object-cover border-4 border-[#FAF8F4] shadow-sm"
+              alt={user.fullname}
+            />
+            
+            <div className="flex-1 w-full">
+              <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4 mb-6">
+                <div>
+                  <h1 className="text-3xl md:text-5xl font-black text-black flex items-center gap-2 mb-2">
+                    @{identifier}
+                    <VerifiedBadge verified={user.is_verified} />
+                  </h1>
+                  <h2 className="text-xl text-gray-600 font-medium">{user.fullname}</h2>
+                </div>
+                <button
+                  className={`px-6 py-3 font-bold rounded-lg transition-all ${
+                    isSelected
+                      ? "bg-black text-white hover:bg-gray-800 shadow-md hover:shadow-lg"
+                      : "bg-white text-black border-2 border-black hover:bg-gray-50"
+                  }`}
+                  onClick={handleToggleList}
+                >
+                  {isSelected ? "Remove from List" : "Add to List"}
+                </button>
+              </div>
 
-          {user.description && (
-            <p className="mt-3 text-sm text-gray-700">{user.description}</p>
-          )}
+              {user.description && (
+                <p className="text-gray-700 leading-relaxed mb-8 max-w-2xl text-lg">
+                  {user.description}
+                </p>
+              )}
 
-          <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
-            <div className="border p-2 rounded">
-              <div className="text-gray-500">Followers</div>
-              <div className="font-semibold">
-                {formatFollowersDetail(user.followers)}
+              {user.url && (
+                <a
+                  href={user.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 font-bold text-black border-b-2 border-black pb-1 hover:opacity-70 transition-opacity mb-10"
+                >
+                  View on {platform} <ExternalLink size={16} />
+                </a>
+              )}
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <StatCard label="Followers" value={formatFollowersDetail(user.followers)} />
+                <StatCard 
+                  label="Engagement Rate" 
+                  value={user.engagement_rate !== undefined ? (user.engagement_rate * 100).toFixed(2) + "%" : "N/A"} 
+                />
+                {user.avg_views !== undefined && user.avg_views > 0 && (
+                  <StatCard label="Avg Views" value={formatFollowersDetail(user.avg_views)} />
+                )}
+                {user.posts_count !== undefined && (
+                  <StatCard label="Posts" value={user.posts_count.toString()} />
+                )}
               </div>
             </div>
-            <div className="border p-2 rounded">
-              <div className="text-gray-500">Engagement Rate</div>
-              <div className="font-semibold">
-                {user.engagement_rate !== undefined
-                  ? (user.engagement_rate * 10000).toFixed(2) + "%"
-                  : "N/A"}
-              </div>
-            </div>
-            {user.posts_count !== undefined && (
-              <div className="border p-2 rounded">
-                <div className="text-gray-500">Posts</div>
-                <div className="font-semibold">{user.posts_count}</div>
-              </div>
-            )}
-            {user.avg_likes !== undefined && (
-              <div className="border p-2 rounded">
-                <div className="text-gray-500">Avg Likes</div>
-                <div className="font-semibold">
-                  {formatFollowersDetail(user.avg_likes)}
-                </div>
-              </div>
-            )}
-            {user.avg_comments !== undefined && (
-              <div className="border p-2 rounded">
-                <div className="text-gray-500">Avg Comments</div>
-                <div className="font-semibold">{user.avg_comments}</div>
-              </div>
-            )}
-            {user.avg_views !== undefined && user.avg_views > 0 && (
-              <div className="border p-2 rounded">
-                <div className="text-gray-500">Avg Views</div>
-                <div className="font-semibold">
-                  {formatFollowersDetail(user.avg_views)}
-                </div>
-              </div>
-            )}
-            {user.engagements !== undefined && (
-              <div className="border p-2 rounded">
-                <div className="text-gray-500">Engagements</div>
-                <div className="font-semibold">
-                  {formatEngagementRate(user.engagement_rate)}
-                </div>
-              </div>
-            )}
           </div>
-
-          {user.url && (
-            <a
-              href={user.url}
-              target="_blank"
-              className="inline-block mt-4 text-blue-600 text-sm"
-            >
-              View on platform →
-            </a>
-          )}
-
-          <button
-            className={`block mt-4 px-4 py-2 rounded font-medium transition-colors ${
-              isSelected
-                ? "bg-red-50 text-red-600 border border-red-200 hover:bg-red-100"
-                : "bg-blue-600 text-white hover:bg-blue-700"
-            }`}
-            onClick={handleToggleList}
-          >
-            {isSelected ? "Remove from List" : "Add to List"}
-          </button>
         </div>
-      </div>
+      </motion.div>
     </Layout>
+  );
+}
+
+function StatCard({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="bg-[#FAF8F4] p-4 rounded-xl border border-black/5">
+      <div className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">{label}</div>
+      <div className="text-2xl font-black text-black">{value}</div>
+    </div>
   );
 }
