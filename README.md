@@ -2,6 +2,10 @@
 
 This is a complete rebuild of the starter influencer search application, developed using React, TypeScript, Vite, Zustand, and Tailwind CSS. The project was refactored to address all intentional bugs, improve the overall architecture, and deliver a modern user experience.
 
+## Live Demo
+The application is deployed and available to test here:  
+👉 **[https://quwrof00.github.io/influencer-search/](https://quwrof00.github.io/influencer-search/)**
+
 ## Running the Application
 
 To run the app locally, install the dependencies and start the development server:
