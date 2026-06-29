@@ -7,6 +7,7 @@ interface ProfileStoreState {
   addProfile: (profile: UserProfileSummary) => void;
   removeProfile: (userId: string) => void;
   clearProfiles: () => void;
+  reorderProfiles: (startIndex: number, endIndex: number) => void;
 }
 
 export const useProfileStore = create<ProfileStoreState>()(
@@ -27,6 +28,13 @@ export const useProfileStore = create<ProfileStoreState>()(
           ),
         })),
       clearProfiles: () => set({ selectedProfiles: [] }),
+      reorderProfiles: (startIndex, endIndex) =>
+        set((state) => {
+          const result = [...state.selectedProfiles];
+          const [removed] = result.splice(startIndex, 1);
+          result.splice(endIndex, 0, removed);
+          return { selectedProfiles: result };
+        }),
     }),
     {
       name: 'wobb-selected-profiles',
