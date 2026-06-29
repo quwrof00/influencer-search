@@ -6,7 +6,7 @@ import { Plus, Minus } from "lucide-react";
 
 interface ProfileCardProps {
   profile: UserProfileSummary;
-  platform: Platform;
+  platform?: Platform;
   searchQuery: string;
   onProfileClick?: (username: string) => void;
 }
@@ -29,9 +29,11 @@ export function ProfileCard({
 
   const identifier = profile.username || profile.handle || profile.user_id;
 
+  const displayPlatform = profile.platform || platform || "instagram";
+
   const handleClick = () => {
     if (onProfileClick) onProfileClick(identifier);
-    navigate(`/profile/${identifier}?platform=${platform}`);
+    navigate(`/profile/${identifier}?platform=${displayPlatform}`);
   };
 
   const handleToggleList = (e: React.MouseEvent) => {
@@ -82,7 +84,7 @@ export function ProfileCard({
       
       <div className="mt-6 pt-4 border-t border-black/5 flex justify-between items-center">
         <div className="text-sm font-bold text-black">{formatFollowersLocal(profile.followers)}</div>
-        <div className="text-xs font-semibold text-gray-400 uppercase tracking-widest">{platform}</div>
+        <div className="text-xs font-semibold text-gray-400 uppercase tracking-widest">{displayPlatform}</div>
       </div>
     </div>
   );

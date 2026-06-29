@@ -3,7 +3,7 @@ import { ProfileCard } from "./ProfileCard";
 
 interface ProfileListProps {
   profiles: UserProfileSummary[];
-  platform: Platform;
+  platform?: Platform;
   searchQuery: string;
   onProfileClick: (username: string) => void;
 }

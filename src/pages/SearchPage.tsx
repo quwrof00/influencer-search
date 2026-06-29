@@ -336,10 +336,17 @@ export function SearchPage() {
   const [platform, setPlatform] = useState<Platform | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // The active platform for data fetching (fall back to instagram when only searching)
-  const activePlatform: Platform = platform ?? "instagram";
+  const allProfiles = useMemo(() => {
+    if (platform === null) {
+      return [
+        ...extractProfiles("instagram"),
+        ...extractProfiles("youtube"),
+        ...extractProfiles("tiktok"),
+      ];
+    }
+    return extractProfiles(platform);
+  }, [platform]);
 
-  const allProfiles = useMemo(() => extractProfiles(activePlatform), [activePlatform]);
   const filtered = useMemo(() => filterProfiles(allProfiles, searchQuery), [allProfiles, searchQuery]);
 
   // Show results when a platform is explicitly selected OR user typed a query
@@ -496,7 +503,7 @@ export function SearchPage() {
             </div>
             <ProfileList
               profiles={filtered}
-              platform={activePlatform}
+              platform={platform || undefined}
               searchQuery={searchQuery}
               onProfileClick={() => { }}
             />

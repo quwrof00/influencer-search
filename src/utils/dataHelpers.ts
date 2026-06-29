@@ -15,7 +15,10 @@ export function getSearchData(platform: Platform): SearchData {
 
 export function extractProfiles(platform: Platform): UserProfileSummary[] {
   const data = getSearchData(platform);
-  return data.accounts.map((item) => item.account.user_profile);
+  return data.accounts.map((item) => ({
+    ...item.account.user_profile,
+    platform,
+  }));
 }
 
 export function filterProfiles(
