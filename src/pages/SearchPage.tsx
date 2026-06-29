@@ -72,7 +72,12 @@ function MockCreatorCard({ creator, index }: { creator: typeof MOCK_CREATORS[0];
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
           <div className="relative">
-            <img src={creator.avatar} alt={creator.name} className="w-11 h-11 rounded-full object-cover" />
+            <img 
+              src={creator.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(creator.name)}&background=random`}
+              onError={(e) => { e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(creator.name)}&background=random`; }}
+              alt={creator.name} 
+              className="w-11 h-11 rounded-full object-cover bg-gray-100" 
+            />
             {creator.verified && (
               <CheckCircle size={14} className="absolute -bottom-0.5 -right-0.5 text-blue-500 fill-white" />
             )}
@@ -377,7 +382,7 @@ export function SearchPage() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.05 }}
-          className="text-5xl md:text-7xl font-black tracking-tight text-black max-w-4xl leading-[1.05] mb-5"
+          className="text-4xl md:text-6xl lg:text-7xl font-black tracking-tight text-black max-w-4xl leading-[1.05] mb-5"
         >
           Find creators that actually{" "}
           <span className="italic font-black">move the needle.</span>
@@ -399,20 +404,20 @@ export function SearchPage() {
           transition={{ delay: 0.15 }}
           className="w-full max-w-2xl mx-auto flex shadow-[0_4px_24px_rgba(0,0,0,0.1)] rounded-xl overflow-hidden border-2 border-black"
         >
-          <div className="flex items-center gap-3 flex-1 bg-white px-5">
+          <div className="flex items-center gap-2 md:gap-3 flex-1 bg-white px-3 md:px-5 min-w-0">
             <Search size={18} className="text-gray-400 shrink-0" />
             <input
               id="main-search"
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by username or name..."
-              className="flex-1 py-4 text-lg focus:outline-none bg-transparent font-medium"
+              placeholder="Search creators..."
+              className="flex-1 min-w-0 py-3 md:py-4 text-base md:text-lg focus:outline-none bg-transparent font-medium"
               aria-label="Search influencers"
             />
           </div>
           <button
-            className="bg-black text-white px-8 py-4 font-bold text-base hover:bg-gray-900 transition-colors shrink-0"
+            className="bg-black text-white px-5 md:px-8 py-3 md:py-4 font-bold text-base hover:bg-gray-900 transition-colors shrink-0"
             aria-label="Submit search"
           >
             Search

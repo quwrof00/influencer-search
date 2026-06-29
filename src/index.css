@@ -21,6 +21,7 @@ a:focus, button:focus, input:focus {
 }
 
 /* Smooth scrolling */
-html {
+html, body {
   scroll-behavior: smooth;
+  overflow-x: clip;
 }
