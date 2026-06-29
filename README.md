@@ -1,80 +1,33 @@
-# Wobb Frontend Assignment
+# Wobb Frontend Assignment Submission
 
-A starter influencer search application built with **React**, **TypeScript**, **Vite**, and **Tailwind CSS**. This project is intentionally left in a rough-but-working state for candidates to improve.
+This is a complete rebuild of the starter influencer search application, developed using React, TypeScript, Vite, Zustand, and Tailwind CSS. The project was refactored to address all intentional bugs, improve the overall architecture, and deliver a modern user experience.
 
-## Getting Started
+## Running the Application
+
+To run the app locally, install the dependencies and start the development server:
 
 ```bash
 npm install
 npm run dev
 ```
 
-Open [http://localhost:5173](http://localhost:5173) to view the app.
+You can verify that the production build passes all checks with no warnings by running `npm run build`.
 
-## What's Included
+## Project Updates and Implementations
 
-- **Search / Dashboard** — filter influencers by platform (Instagram, YouTube, TikTok) and search by username or full name
-- **Profile Details** — click a profile to view extended data loaded from individual JSON files
-- **Routing** — `react-router-dom` with `/` (search) and `/profile/:username` (details)
+### Architecture and State Management
+I removed the existing React Context setup and replaced it with Zustand to handle state management across the application. I utilized Zustand's persist middleware to save the user's selected campaign list directly to localStorage. This ensures that the user's data remains intact across page reloads without adding the overhead of a larger database solution like IndexedDB, which would be unnecessary for storing small arrays of influencer objects.
 
-Sample data lives in:
+### Interface Redesign
+The entire application layout was redesigned to prioritize usability and visual hierarchy. I used Tailwind CSS alongside Framer Motion to handle page transitions and micro-interactions. The "Add to List" feature, which was previously an inactive stub, is now fully functional. It operates via a sliding side panel that can be toggled from anywhere in the app, allowing users to build and review their campaign lists dynamically without losing their place on the search page.
 
-- `src/assets/data/search/` — platform search results (10 profiles each)
-- `src/assets/data/profiles/` — detailed profile JSON per username
+### Resiliency and Bug Fixes
+The original codebase contained several bugs, including strict mode incompatibilities and routing mismatches, which have all been fixed. I also implemented robust fallback mechanisms for the data layers:
+* Image loading: Many of the avatar URLs provided in the raw JSON files are expired or protected against hotlinking. I added onError fallbacks throughout the application so that if a primary image fails to load, a clean, auto-generated placeholder is rendered in its place.
+* Data loading: Since only six specific users have detailed JSON files provided in the data directory, attempting to view the profile of any other user resulted in a 404 error. To prevent this, the profileLoader utility was rewritten to scan the platform JSON arrays. If a detailed file is missing, the application dynamically constructs a fallback profile view using their search summary data.
 
-## How to Submit
+### Code Cleanup
+I audited the project structure and removed obsolete files like the unused SearchBar and SelectedProfilesList components. All files are properly typed with TypeScript, and the final codebase passes the linter with zero errors.
 
-1. **Download or clone** this starter project to your machine.
-2. **Create a new repository** on your own GitHub account. Do not fork the original assignment repo — push your work to a repo you own.
-3. Complete the tasks below and push your changes to that repository.
-4. **Share the public GitHub repository URL** with us as your submission.
-
-### Deadline (strict)
-
-- **Due:** **2 July 2026, 2:00 PM IST** (Indian Standard Time, UTC+5:30)
-- **Any git commits made after this deadline will disqualify your submission.** We will only consider the repository state as of the deadline; late commits will not be reviewed.
-- Make sure your final work is pushed **before** the cutoff.
-
-## AI Usage
-
-You may use any AI tools (Cursor, ChatGPT, Claude, GitHub Copilot, etc.). We are evaluating your final solution and engineering decisions.
-
-## Your Tasks
-
-Complete the following as part of your submission:
-
-1. **Find and fix all bugs and quality issues** — the codebase contains intentional bugs and quality issues. Identify and resolve them.
-
-2. **Completely redesign the UI/UX** — replace the basic layout with a polished, modern interface. Focus on usability, visual hierarchy, and delight.
-
-3. **Replace React Context with Zustand** — when you implement state management for the selected list, use [Zustand](https://github.com/pmndrs/zustand) instead of React Context.
-
-4. **Implement "Select profile & Add to List"** — the disabled "Add to List" button is a stub. Build the full feature:
-   - Select / add profiles to a persistent list
-   - View and manage the selected list
-   - Handle duplicates appropriately
-
-5. **Improve code quality and project structure** — refactor as needed, add proper types, and follow React best practices.
-
-6. **Optimize performance** — apply sensible optimizations where appropriate.
-
-7. **Use any libraries you need** — you are not limited to the current stack. Choose tools that help you deliver a great result (UI kits, state managers, testing libraries, etc.).
-
-## Scripts
-
-| Command        | Description              |
-| -------------- | ------------------------ |
-| `npm run dev`  | Start development server |
-| `npm run build`| Production build         |
-| `npm run lint` | Run ESLint               |
-
-## Submission Notes
-
-- Document any assumptions or trade-offs in your README
-- Ensure `npm run build` passes before submitting
-- Focus on demonstrating your judgment — not every possible feature needs to be built, but the core assignment items should be addressed thoughtfully
-- Double-check that your repo is public (or that we have access) and that the link is included in your submission
-- Please make meaningful commits throughout your work. We may review your commit history.
-- **Bonus:** Deploying the app (e.g. Vercel, Netlify, GitHub Pages) is optional but will be considered a plus — include the live URL in your submission if you do
-
-Good luck!
+## Author
+Shourya

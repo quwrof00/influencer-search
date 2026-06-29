@@ -2,41 +2,27 @@ import type { Platform } from "@/types";
 import { PLATFORMS, getPlatformLabel } from "@/utils/dataHelpers";
 
 interface PlatformFilterProps {
-  selected: Platform;
+  selected: Platform | null;
   onChange: (platform: Platform) => void;
-  searchQuery: string;
-  onSearchChange: (value: string) => void;
 }
 
-export function PlatformFilter({
-  selected,
-  onChange,
-  searchQuery,
-  onSearchChange,
-}: PlatformFilterProps) {
+export function PlatformFilter({ selected, onChange }: PlatformFilterProps) {
   return (
-    <div className="mb-4">
-      <div className="flex gap-2 justify-center mb-3">
-        {PLATFORMS.map((p) => (
-          <button
-            key={p}
-            type="button"
-            onClick={() => onChange(p)}
-            className={`px-4 py-2 border rounded ${
-              selected === p ? "bg-gray-800 text-white" : "bg-white text-gray-800"
-            }`}
-          >
-            {getPlatformLabel(p)}
-          </button>
-        ))}
-      </div>
-      <input
-        type="text"
-        value={searchQuery}
-        onChange={(e) => onSearchChange(e.target.value)}
-        placeholder="Search by username or name..."
-        className="w-full max-w-md border px-3 py-2 rounded"
-      />
+    <div className="flex gap-4 justify-center">
+      {PLATFORMS.map((p) => (
+        <button
+          key={p}
+          type="button"
+          onClick={() => onChange(p)}
+          className={`font-semibold text-sm tracking-wide px-4 py-2 rounded-full border-2 transition-all ${
+            selected === p
+              ? "border-black bg-black text-white"
+              : "border-black/10 text-gray-500 hover:border-black hover:text-black bg-white"
+          }`}
+        >
+          {getPlatformLabel(p)}
+        </button>
+      ))}
     </div>
   );
 }
