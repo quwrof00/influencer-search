@@ -23,10 +23,12 @@ export function filterProfiles(
   query: string
 ): UserProfileSummary[] {
   if (!query) return profiles;
+  const lowerQuery = query.toLowerCase();
   return profiles.filter((p) => {
-    const matchUsername = p.username.includes(query);
-    const matchFullname = p.fullname.toLowerCase().includes(query.toLowerCase());
-    return matchUsername || matchFullname;
+    const matchUsername = p.username?.toLowerCase().includes(lowerQuery) || false;
+    const matchFullname = p.fullname?.toLowerCase().includes(lowerQuery) || false;
+    const matchHandle = p.handle?.toLowerCase().includes(lowerQuery) || false;
+    return matchUsername || matchFullname || matchHandle;
   });
 }
 

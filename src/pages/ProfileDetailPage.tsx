@@ -5,6 +5,7 @@ import { VerifiedBadge } from "@/components/VerifiedBadge";
 import type { FullUserProfile, ProfileDetailResponse } from "@/types";
 import { formatEngagementRate } from "@/utils/formatters";
 import { loadProfileByUsername } from "@/utils/profileLoader";
+import { useProfileStore } from "@/store/useProfileStore";
 
 function formatFollowersDetail(count: number) {
   if (count >= 1000000) return (count / 1000000).toFixed(2) + "M";
@@ -16,6 +17,7 @@ export function ProfileDetailPage() {
   const { username } = useParams<{ username: string }>();
   const [searchParams] = useSearchParams();
   const platform = searchParams.get("platform") || "unknown";
+  const { selectedProfiles, addProfile, removeProfile } = useProfileStore();
   const [profileData, setProfileData] = useState<ProfileDetailResponse | null>(
     null
   );
@@ -61,6 +63,16 @@ export function ProfileDetailPage() {
   }
 
   const user: FullUserProfile = profileData.data.user_profile;
+  const identifier = user.username || user.handle || user.user_id;
+  const isSelected = selectedProfiles.some((p) => p.user_id === user.user_id);
+
+  const handleToggleList = () => {
+    if (isSelected) {
+      removeProfile(user.user_id);
+    } else {
+      addProfile(user);
+    }
+  };
 
   return (
     <Layout title={user.fullname}>
@@ -75,7 +87,7 @@ export function ProfileDetailPage() {
         />
         <div className="flex-1">
           <h2 className="text-xl font-bold">
-            @{user.username}
+            @{identifier}
             <VerifiedBadge verified={user.is_verified} />
           </h2>
           <p className="text-gray-600">{user.fullname}</p>
@@ -148,13 +160,15 @@ export function ProfileDetailPage() {
             </a>
           )}
 
-          {/* TODO: candidates must implement Add to List feature */}
-          {/* TODO: candidates must implement Add to List feature */}
           <button
-            disabled
-            className="block mt-4 px-4 py-2 bg-gray-300 text-gray-500 rounded cursor-not-allowed"
+            className={`block mt-4 px-4 py-2 rounded font-medium transition-colors ${
+              isSelected
+                ? "bg-red-50 text-red-600 border border-red-200 hover:bg-red-100"
+                : "bg-blue-600 text-white hover:bg-blue-700"
+            }`}
+            onClick={handleToggleList}
           >
-            Add to List
+            {isSelected ? "Remove from List" : "Add to List"}
           </button>
         </div>
       </div>
