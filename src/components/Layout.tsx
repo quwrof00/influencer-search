@@ -21,9 +21,7 @@ export function Layout({ children }: LayoutProps) {
         <Link 
           to="/" 
           onClick={() => {
-            if (window.location.pathname === '/') {
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
           className="flex items-center gap-2 text-xl font-black tracking-tighter"
         >
