@@ -15,7 +15,7 @@ export function Layout({ children }: LayoutProps) {
   const selectedCount = useProfileStore((s) => s.selectedProfiles.length);
 
   return (
-    <div className="min-h-screen flex flex-col font-sans">
+    <div className="min-h-screen flex flex-col font-sans overflow-x-hidden">
       <header className="w-full px-6 py-4 flex items-center justify-between border-b border-black/5 bg-[#FAF8F4] sticky top-0 z-30">
         {/* Logo */}
         <Link 
